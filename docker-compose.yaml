@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  app:
+    user: "${USER_ID:-1000}"
+    hostname: "${HOST_NAME:-jeffrey}"
+    image: "${IMAGE_NAME:-jeffrey-template}"
+    container_name: "${CONTAINER_NAME:-jeffrey-template-container}"
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      args:
+        USER_NAME: "${USER_NAME:-jihoahn}"
+        USER_ID: "${USER_ID:-1000}"
+    volumes:
+      - ./:/app/
+      - ~/.config/gcloud:/home/${USER_NAME}/.config/gcloud
+    ports:
+      - 8080:8080
+    ipc: host
+    init: true
+
+
