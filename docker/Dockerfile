@@ -32,7 +32,7 @@ RUN chmod a+x /app/docker/scripts/*.sh \
     --uid ${USER_ID} \
     --gid ${USER_NAME} \
     --groups ${USER_NAME} ${USER_NAME} \
-    && chown -R ${USER_NAME}:${USER_NAME} /app /tmp ${HOME} 
+    && chown -R ${USER_NAME}:${USER_NAME} /app /tmp ${HOME}
 
 USER ${USER_NAME}:${USER_NAME}
 RUN curl -sSL https://install.python-poetry.org | python3 -

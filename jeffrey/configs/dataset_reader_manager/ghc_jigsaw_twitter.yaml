@@ -1,0 +1,4 @@
+defaults:
+  - dataset_reader_manager_schema
+  # {target folder contains target yaml file}@{config name in dataclass}.{arbitrary group name}: {name for target yaml file}
+  - dataset_reader@dataset_readers.custom: ghc

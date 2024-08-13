@@ -5,6 +5,7 @@ from hydra.core.config_store import ConfigStore
 @dataclass
 class GCPConfig:
     project_id: str = "e2eml-jiho-430901"
+    secret_version: str = "v1"
     
     
 def register_config() -> None:
