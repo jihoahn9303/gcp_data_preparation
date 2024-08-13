@@ -27,8 +27,8 @@ guard-%:
 	@$(or ${$*}, $(error $* is not set))
 
 ## Call entrypoint code
-prepare-dataset: up
-	$(DOCKER_COMPOSE_EXEC) python ./jeffrey/prepare_dataset.py
+prepare-data: up
+	$(DOCKER_COMPOSE_EXEC) python ./jeffrey/prepare-data.py
 
 ## Starts jupyter lab
 notebook: up
