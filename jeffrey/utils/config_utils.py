@@ -7,7 +7,7 @@ import hydra
 from hydra.types import TaskFunction
 from omegaconf import DictConfig, OmegaConf
 
-from jeffrey.config_schemas import config_schema
+from jeffrey.config_schemas import data_preparing_config_schema
 
 
 def get_config(config_path: str, config_name: str) -> TaskFunction:
@@ -25,7 +25,7 @@ def get_config(config_path: str, config_name: str) -> TaskFunction:
     return main_decorator
 
 def setup_config() -> None:
-    config_schema.setup_config()
+    data_preparing_config_schema.setup_config()
 
 def setup_logger() -> None:
     with open("./jeffrey/configs/hydra/job_logging/custom.yaml", "r") as stream:
