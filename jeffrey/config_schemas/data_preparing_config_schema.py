@@ -2,8 +2,8 @@ from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
 from pydantic.dataclasses import dataclass
 
-from jeffrey.config_schemas.data_processing import dataset_readers_schema
-from jeffrey.config_schemas.infrastructure import gcp_schema
+from config_schemas.data_processing import dataset_readers_schema
+from config_schemas.infrastructure import gcp_schema
 
 
 @dataclass

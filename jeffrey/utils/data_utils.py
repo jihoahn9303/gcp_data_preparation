@@ -1,6 +1,6 @@
 from shutil import rmtree
 
-from jeffrey.utils.utils import run_shell_command
+from utils.utils import run_shell_command
 
 
 def get_cmd_to_get_raw_data(

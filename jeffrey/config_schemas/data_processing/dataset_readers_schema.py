@@ -14,13 +14,13 @@ class DatasetReaderConfig:
     
 @dataclass
 class GHCDatasetReaderConfig(DatasetReaderConfig):
-    _target_: str = "jeffrey.data_processing.dataset_readers.GHCDatasetReader"
+    _target_: str = "data_processing.dataset_readers.GHCDatasetReader"
     valid_split_ratio: float = MISSING
     
     
 @dataclass
 class DatasetReaderManagerConfig:
-    _target_: str = "jeffrey.data_processing.dataset_readers.DatasetReaderManager"
+    _target_: str = "data_processing.dataset_readers.DatasetReaderManager"
     dataset_readers: Any = MISSING
     
     

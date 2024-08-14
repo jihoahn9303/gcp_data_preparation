@@ -1,9 +1,9 @@
 from hydra.utils import instantiate
 
-from jeffrey.config_schemas.data_preparing_config_schema import DataPreparingConfig
-from jeffrey.utils.config_utils import get_config
-from jeffrey.utils.data_utils import get_raw_data_with_version
-from jeffrey.utils.gcp_utils import access_secret_version
+from config_schemas.data_preparing_config_schema import DataPreparingConfig
+from utils.config_utils import get_config
+from utils.data_utils import get_raw_data_with_version
+from utils.gcp_utils import access_secret_version
 
 
 @get_config(config_path="../configs", config_name="data_preparing_config")

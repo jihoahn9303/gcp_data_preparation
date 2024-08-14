@@ -5,7 +5,7 @@ from typing import Optional
 import dask.dataframe as dd
 from dask_ml.model_selection import train_test_split
 
-from jeffrey.utils.utils import get_logger
+from utils.utils import get_logger
 
 
 class DatasetReader(ABC):
@@ -39,6 +39,7 @@ class DatasetReader(ABC):
     def _read_data(self) -> tuple[dd.DataFrame, dd.DataFrame, dd.DataFrame]:
         """
         Read and split dataset into 3 splits: train, valid, test.
+        If required, this function should make 'label' column.
         The return value must be a dd.DataFrame, with required columns: self.required_columns
         """
         pass
@@ -69,20 +70,20 @@ class DatasetReader(ABC):
                 shuffle=True
             )
         unique_column_values = df[stratify_column].unique()
-        train_dfs, valid_dfs = [], []
+        first_dfs, second_dfs = [], []
         
         for unique_column in unique_column_values:
             sub_df = df[df[stratify_column] == unique_column]
-            sub_train_df, sub_valid_df = train_test_split(
+            sub_first_df, sub_second_df = train_test_split(
                 sub_df, 
                 test_size=test_size, 
                 random_state=1234, 
                 shuffle=True
             )
-            train_dfs.append(sub_train_df)
-            valid_dfs.append(sub_valid_df)
+            first_dfs.append(sub_first_df)
+            second_dfs.append(sub_second_df)
         
-        return dd.concat(train_dfs), dd.concat(valid_dfs)
+        return dd.concat(first_dfs), dd.concat(second_dfs)
     
 
 class GHCDatasetReader(DatasetReader):
