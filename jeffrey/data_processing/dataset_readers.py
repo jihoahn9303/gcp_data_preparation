@@ -91,10 +91,10 @@ class GHCDatasetReader(DatasetReader):
         self, 
         dataset_dir: str, 
         dataset_name: str, 
-        valid_split_ratio: float
+        split_ratio: float
     ) -> None:
         super().__init__(dataset_dir, dataset_name)
-        self.valid_split_ratio = valid_split_ratio
+        self.split_ratio = split_ratio
         
     def _read_data(self) -> tuple[dd.DataFrame, dd.DataFrame, dd.DataFrame]:
         self.logger.info("Reading GHC Dataset...")
@@ -117,12 +117,108 @@ class GHCDatasetReader(DatasetReader):
         
         train_df, valid_df = self.split_dataset(
             df=train_df, 
-            test_size=self.valid_split_ratio, 
+            test_size=self.split_ratio, 
             stratify_column="label"
         )
         
         return train_df, valid_df, test_df
     
+
+class JigsawToxicCommentsDatasetReader(DatasetReader):
+    def __init__(
+        self, 
+        dataset_dir: str, 
+        dataset_name: str, 
+        split_ratio: float
+    ) -> None:
+        super().__init__(dataset_dir, dataset_name)
+        self.split_ratio = split_ratio
+        
+    def get_text_and_label_columns(self, df: dd.DataFrame) -> dd.DataFrame:
+        excluded_columns = ["id", "comment_text"]
+        remaining_columns = df.columns.difference(excluded_columns).tolist()
+        
+        df["label"] = (df[remaining_columns].sum(axis=1) > 0).astype(int)
+        df = df.rename(columns={"comment_text": "text"})
+        
+        return df
+        
+    def _read_data(self) -> tuple[dd.DataFrame, dd.DataFrame, dd.DataFrame]:
+        self.logger.info("Reading Jigsaw toxic Dataset...")
+        
+        test_csv_path = os.path.join(self.dataset_dir, 'test.csv')
+        test_df = dd.read_csv(test_csv_path)
+        
+        test_labels_csv_path = os.path.join(self.dataset_dir, 'test_labels.csv')
+        test_labels_df = dd.read_csv(test_labels_csv_path)
+        
+        test_df = test_df.merge(test_labels_df, on=["id"])
+        test_df = test_df[test_df["toxic"] != -1]
+        test_df = self.get_text_and_label_columns(test_df)
+        
+        train_csv_path = os.path.join(self.dataset_dir, 'train.csv')
+        train_df = dd.read_csv(train_csv_path)
+        train_df = self.get_text_and_label_columns(train_df)
+        
+        train_df, valid_df = self.split_dataset(
+            df=train_df,
+            test_size=self.split_ratio,
+            stratify_column="label"
+        )
+        
+        return train_df, valid_df, test_df
+    
+
+class TwitterDatasetReader(DatasetReader):
+    def __init__(
+        self, 
+        dataset_dir: str, 
+        dataset_name: str, 
+        valid_split_ratio: float,
+        test_split_ratio: float
+    ) -> None:
+        super().__init__(dataset_dir, dataset_name)
+        self.valid_split_ratio = valid_split_ratio
+        self.test_split_ratio = test_split_ratio
+        
+    @staticmethod
+    def get_label_from_comment_text(text: str) -> int:
+        if text == 'not_cyberbullying':  return 0
+        else:   return 1
+    
+    def get_text_and_label_columns(self, df: dd.DataFrame) -> dd.DataFrame:
+        df["label"] = df["cyberbullying_type"].apply(
+            func=lambda x: self.get_label_from_comment_text(x), 
+            meta=('x', 'int64')
+        )
+        df = df.rename(columns={"tweet_text": "text"})
+        
+        excluded_columns = ["cyberbullying_type"]
+        remaining_columns = df.columns.difference(excluded_columns).tolist()
+        
+        return df[remaining_columns]
+    
+    def _read_data(self) -> tuple[dd.DataFrame, dd.DataFrame, dd.DataFrame]:
+        self.logger.info("Reading Twitter Dataset...")
+        
+        df_path = os.path.join(self.dataset_dir, 'cyberbullying_tweets.csv')
+        df = dd.read_csv(df_path)
+        df = self.get_text_and_label_columns(df)
+        
+        train_df, valid_df = self.split_dataset(
+            df=df,
+            test_size=self.valid_split_ratio,
+            stratify_column="label"
+        )
+        
+        valid_df, test_df = self.split_dataset(
+            df=valid_df,
+            test_size=self.test_split_ratio,
+            stratify_column="label"
+        )
+        
+        return train_df, valid_df, test_df
+
 
 class DatasetReaderManager:
     def __init__(self, dataset_readers: dict[str, DatasetReader]) -> None:

@@ -3,4 +3,4 @@ defaults:
 
 dataset_dir: ${data_local_save_dir}/ghc
 dataset_name: ghc
-valid_split_ratio: 0.2
+split_ratio: 0.2
