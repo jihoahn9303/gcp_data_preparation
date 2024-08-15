@@ -24,10 +24,22 @@ def process_data(config: DataPreparingConfig) -> None:
     )
     
     dataset_reader_manager = instantiate(config.dataset_reader_manager)
-    df = dataset_reader_manager.read_data()
+    dataset_cleaner_manager = instantiate(config.dataset_cleaner_manager)
     
-    print(df.head())
-    print(df["dataset_name"].unique().compute())
+    df = dataset_reader_manager.read_data().compute()
+    sample_df = df.sample(n=5)
+    
+    for _, row in sample_df.iterrows():
+        text = row["text"]
+        cleaned_text = dataset_cleaner_manager(text)
+        
+        print(50 * '#')
+        print(f"{text=}")
+        print(f"{cleaned_text=}")
+        print(50 * '#')
+    
+    # print(df.head())
+    # print(df["dataset_name"].unique().compute())
     
 if __name__ == "__main__":
     process_data()  # type: ignore
