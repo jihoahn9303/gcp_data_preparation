@@ -1,11 +1,11 @@
-from dataclasses import field
 import string
+
+from dataclasses import field
 from typing import Any
 
-from omegaconf import MISSING
 from hydra.core.config_store import ConfigStore
+from omegaconf import MISSING
 from pydantic.dataclasses import dataclass
-
 
 
 @dataclass
@@ -14,85 +14,82 @@ class SpellCorrectionModelConfig:
     max_dictionary_edit_distance: int = 2
     prefix_length: int = 7
     count_threshold: int = 1
-    
+
 
 @dataclass
 class DatasetCleanerConfig:
     _target_: str = MISSING
-    
-    
+
+
 @dataclass
 class StopWordsDatasetCleanerConfig(DatasetCleanerConfig):
     _target_: str = "data_processing.dataset_cleaners.StopWordsDatasetCleaner"
-    
+
 
 @dataclass
 class ToLowerCaseDatasetCleanerConfig(DatasetCleanerConfig):
     _target_: str = "data_processing.dataset_cleaners.ToLowerCaseDatasetCleaner"
-    
-    
+
+
 @dataclass
 class URLDatasetCleanerConfig(DatasetCleanerConfig):
     _target_: str = "data_processing.dataset_cleaners.URLDatasetCleaner"
-    
-    
+
+
 @dataclass
 class PunctuationDatasetCleanerConfig(DatasetCleanerConfig):
     _target_: str = "data_processing.dataset_cleaners.PunctuationDatasetCleaner"
     punctuation: str = string.punctuation
-    
+
+
 @dataclass
 class NonLettersDatasetCleanerConfig(DatasetCleanerConfig):
     _target_: str = "data_processing.dataset_cleaners.NonLettersDatasetCleaner"
-    
+
 
 @dataclass
 class NewLineCharacterDatasetCleanerConfig(DatasetCleanerConfig):
     _target_: str = "data_processing.dataset_cleaners.NewLineCharacterDatasetCleaner"
-    
+
 
 @dataclass
 class NonASCIIDatasetCleanerConfig(DatasetCleanerConfig):
     _target_: str = "data_processing.dataset_cleaners.NonASCIIDatasetCleaner"
-    
-    
+
+
 @dataclass
 class ReferanceToAccountDatasetCleanerConfig(DatasetCleanerConfig):
     _target_: str = "data_processing.dataset_cleaners.ReferanceToAccountDatasetCleaner"
-    
-    
+
+
 @dataclass
 class ReTweetDatasetCleanerConfig(DatasetCleanerConfig):
     _target_: str = "data_processing.dataset_cleaners.ReTweetDatasetCleaner"
-    
+
 
 @dataclass
 class SpellCorrectionDatasetCleanerConfig(DatasetCleanerConfig):
     _target_: str = "data_processing.dataset_cleaners.SpellCorrectionDatasetCleaner"
     spell_correction_model: Any = SpellCorrectionModelConfig()
-    
+
 
 @dataclass
 class CharacterLimiterDatasetCleanerConfig(DatasetCleanerConfig):
     _target_: str = "data_processing.dataset_cleaners.CharacterLimiterDatasetCleaner"
     character_limit: int = 300
 
-    
+
 @dataclass
 class DatasetCleanerManagerConfig:
     _target_: str = "data_processing.dataset_cleaners.DatasetCleanerManager"
     dataset_cleaners: Any = field(default_factory=lambda: {})
-    
+
 
 def register_config() -> None:
     cs = ConfigStore.instance()
 
-    cs.store(
-        group="dataset_cleaner_manager", 
-        name="dataset_cleaner_manager_schema", 
-        node=DatasetCleanerManagerConfig
-    )
-    
+    cs.store(group="dataset_cleaner_manager", name="dataset_cleaner_manager_schema", node=DatasetCleanerManagerConfig)
+
     cs.store(
         group="dataset_cleaner_manager/dataset_cleaner",
         name="stop_words_dataset_cleaner_schema",
@@ -106,9 +103,7 @@ def register_config() -> None:
     )
 
     cs.store(
-        group="dataset_cleaner_manager/dataset_cleaner", 
-        name="url_dataset_cleaner_schema", 
-        node=URLDatasetCleanerConfig
+        group="dataset_cleaner_manager/dataset_cleaner", name="url_dataset_cleaner_schema", node=URLDatasetCleanerConfig
     )
 
     cs.store(
@@ -152,11 +147,9 @@ def register_config() -> None:
         name="spell_correction_dataset_cleaner_schema",
         node=SpellCorrectionDatasetCleanerConfig,
     )
-    
+
     cs.store(
         group="dataset_cleaner_manager/dataset_cleaner",
         name="character_limiter_dataset_cleaner_schema",
         node=CharacterLimiterDatasetCleanerConfig,
     )
-
-    

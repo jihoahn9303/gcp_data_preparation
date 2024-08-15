@@ -2073,13 +2073,13 @@ grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0.dev0)"]
 
 [[package]]
 name = "google-api-python-client"
-version = "2.140.0"
+version = "2.141.0"
 description = "Google API Client Library for Python"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "google_api_python_client-2.140.0-py2.py3-none-any.whl", hash = "sha256:aeb4bb99e9fdd241473da5ff35464a0658fea0db76fe89c0f8c77ecfc3813404"},
-    {file = "google_api_python_client-2.140.0.tar.gz", hash = "sha256:0bb973adccbe66a3d0a70abe4e49b3f2f004d849416bfec38d22b75649d389d8"},
+    {file = "google_api_python_client-2.141.0-py2.py3-none-any.whl", hash = "sha256:43c05322b91791204465291b3852718fae38d4f84b411d8be847c4f86882652a"},
+    {file = "google_api_python_client-2.141.0.tar.gz", hash = "sha256:0f225b1f45d5a6f8c2a400f48729f5d6da9a81138e81e0478d61fdd8edf6563a"},
 ]
 
 [package.dependencies]
@@ -5704,13 +5704,13 @@ files = [
 
 [[package]]
 name = "tomlkit"
-version = "0.13.0"
+version = "0.13.2"
 description = "Style preserving TOML library"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "tomlkit-0.13.0-py3-none-any.whl", hash = "sha256:7075d3042d03b80f603482d69bf0c8f345c2b30e41699fd8883227f89972b264"},
-    {file = "tomlkit-0.13.0.tar.gz", hash = "sha256:08ad192699734149f5b97b45f1f18dad7eb1b6d16bc72ad0c2335772650d7b72"},
+    {file = "tomlkit-0.13.2-py3-none-any.whl", hash = "sha256:7a974427f6e119197f670fbbbeae7bef749a6c14e793db934baefc1b5f03efde"},
+    {file = "tomlkit-0.13.2.tar.gz", hash = "sha256:fff5fe59a87295b278abd31bec92c15d9bc4a06885ab12bcea52c71119392e79"},
 ]
 
 [[package]]
@@ -5780,6 +5780,50 @@ docs = ["myst-parser", "pydata-sphinx-theme", "sphinx"]
 test = ["argcomplete (>=3.0.3)", "mypy (>=1.7.0)", "pre-commit", "pytest (>=7.0,<8.2)", "pytest-mock", "pytest-mypy-testing"]
 
 [[package]]
+name = "types-cachetools"
+version = "5.4.0.20240717"
+description = "Typing stubs for cachetools"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-cachetools-5.4.0.20240717.tar.gz", hash = "sha256:1eae90c48760bac44ab89108be938e8ce1d740910f2d4b68446dcdc82763f186"},
+    {file = "types_cachetools-5.4.0.20240717-py3-none-any.whl", hash = "sha256:67c84c26df988039be68344b162afd2dd7cd3741dc08e7d67aa1954782fd2d2a"},
+]
+
+[[package]]
+name = "types-decorator"
+version = "5.1.8.20240310"
+description = "Typing stubs for decorator"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-decorator-5.1.8.20240310.tar.gz", hash = "sha256:52e316b03783886a8a2abdc228f7071680ba65894545cd2085ebe3cf88684a0e"},
+    {file = "types_decorator-5.1.8.20240310-py3-none-any.whl", hash = "sha256:3af75dc38f5baf65b9b53ea6661ce2056c5ca7d70d620d0b1f620285c1242757"},
+]
+
+[[package]]
+name = "types-protobuf"
+version = "5.27.0.20240626"
+description = "Typing stubs for protobuf"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-protobuf-5.27.0.20240626.tar.gz", hash = "sha256:683ba14043bade6785e3f937a7498f243b37881a91ac8d81b9202ecf8b191e9c"},
+    {file = "types_protobuf-5.27.0.20240626-py3-none-any.whl", hash = "sha256:688e8f7e8d9295db26bc560df01fb731b27a25b77cbe4c1ce945647f7024f5c1"},
+]
+
+[[package]]
+name = "types-pycurl"
+version = "7.45.3.20240421"
+description = "Typing stubs for pycurl"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-pycurl-7.45.3.20240421.tar.gz", hash = "sha256:0d5b3b9243e3940e26b782c1cdc0b2438d244ee2e8dcde09cf523635a42ff406"},
+    {file = "types_pycurl-7.45.3.20240421-py3-none-any.whl", hash = "sha256:c20b56426cd67e4a80682d054391f6bab725d5fc31baae0c3eef9bbec00629c3"},
+]
+
+[[package]]
 name = "types-python-dateutil"
 version = "2.9.0.20240316"
 description = "Typing stubs for python-dateutil"
@@ -5788,6 +5832,42 @@ python-versions = ">=3.8"
 files = [
     {file = "types-python-dateutil-2.9.0.20240316.tar.gz", hash = "sha256:5d2f2e240b86905e40944dd787db6da9263f0deabef1076ddaed797351ec0202"},
     {file = "types_python_dateutil-2.9.0.20240316-py3-none-any.whl", hash = "sha256:6b8cb66d960771ce5ff974e9dd45e38facb81718cc1e208b10b1baccbfdbee3b"},
+]
+
+[[package]]
+name = "types-pyyaml"
+version = "6.0.12.20240808"
+description = "Typing stubs for PyYAML"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-PyYAML-6.0.12.20240808.tar.gz", hash = "sha256:b8f76ddbd7f65440a8bda5526a9607e4c7a322dc2f8e1a8c405644f9a6f4b9af"},
+    {file = "types_PyYAML-6.0.12.20240808-py3-none-any.whl", hash = "sha256:deda34c5c655265fc517b546c902aa6eed2ef8d3e921e4765fe606fe2afe8d35"},
+]
+
+[[package]]
+name = "types-requests"
+version = "2.32.0.20240712"
+description = "Typing stubs for requests"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-requests-2.32.0.20240712.tar.gz", hash = "sha256:90c079ff05e549f6bf50e02e910210b98b8ff1ebdd18e19c873cd237737c1358"},
+    {file = "types_requests-2.32.0.20240712-py3-none-any.whl", hash = "sha256:f754283e152c752e46e70942fa2a146b5bc70393522257bb85bd1ef7e019dcc3"},
+]
+
+[package.dependencies]
+urllib3 = ">=2"
+
+[[package]]
+name = "types-six"
+version = "1.16.21.20240513"
+description = "Typing stubs for six"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-six-1.16.21.20240513.tar.gz", hash = "sha256:cdf445b5161bf17753500713a475ab79a45bd0d87728b8bfcecd86e2fbf66402"},
+    {file = "types_six-1.16.21.20240513-py3-none-any.whl", hash = "sha256:af2a105be6d504339bfed81319cc8e8697865f0ee5c6baa63658f127b33b9e63"},
 ]
 
 [[package]]
@@ -6089,4 +6169,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "a460f8546e83de07cf543fa9bb8cca5e5cc35d1625f9af1889519f42e1ed6c62"
+content-hash = "cb7f6c9bd33cd3e80ec35a3ad2ec86f51ee619607b7c70bd6b9f25f59491919b"
