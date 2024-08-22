@@ -1,5 +1,6 @@
 from config_schemas.data_processing import dataset_cleaners_schema, dataset_readers_schema
 from config_schemas.infrastructure import gcp_schema
+from config_schemas.dask_cluster import dask_cluster_schema
 from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
 from pydantic.dataclasses import dataclass
@@ -17,12 +18,14 @@ class DataPreparingConfig:
     infrastructure: gcp_schema.GCPConfig = gcp_schema.GCPConfig()
     dataset_reader_manager: dataset_readers_schema.DatasetReaderManagerConfig = MISSING
     dataset_cleaner_manager: dataset_cleaners_schema.DatasetCleanerManagerConfig = MISSING
+    dask_cluster: dask_cluster_schema.DaskClusterConfig = MISSING
 
 
 def setup_config() -> None:
     gcp_schema.register_config()
     dataset_readers_schema.register_config()
     dataset_cleaners_schema.register_config()
+    dask_cluster_schema.register_config()
 
     cs = ConfigStore.instance()
     cs.store(name="data_preparing_config_schema", node=DataPreparingConfig)
