@@ -35,6 +35,7 @@ class TwitterDatasetReader(DatasetReaderConfig):
 class DatasetReaderManagerConfig:
     _target_: str = "data_processing.dataset_readers.DatasetReaderManager"
     dataset_readers: Any = MISSING
+    repartition: bool = True
 
 
 def register_config() -> None:

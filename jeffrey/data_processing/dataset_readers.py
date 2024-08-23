@@ -7,6 +7,7 @@ import dask.dataframe as dd
 
 from dask_ml.model_selection import train_test_split
 from utils.utils import get_logger
+from utils.data_utils import repartition_dataframe
 
 
 class DatasetReader(ABC):
@@ -168,10 +169,13 @@ class TwitterDatasetReader(DatasetReader):
 
 
 class DatasetReaderManager:
-    def __init__(self, dataset_readers: dict[str, DatasetReader]) -> None:
+    def __init__(self, dataset_readers: dict[str, DatasetReader], repartition: bool = True) -> None:
         self.dataset_readers = dataset_readers
+        self.repartition = repartition
 
-    def read_data(self) -> dd.DataFrame:
+    def read_data(self, n_workers: int) -> dd.DataFrame:
         dfs = [dataset_reader.read_data() for dataset_reader in self.dataset_readers.values()]
         df = dd.concat(dfs)
+        if self.repartition:
+            df = repartition_dataframe(df, n_workers=n_workers)
         return df

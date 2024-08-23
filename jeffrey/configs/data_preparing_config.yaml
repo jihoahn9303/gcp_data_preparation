@@ -16,3 +16,4 @@ hydra:
 
 data_version: v3
 access_token_secret_version: "1"
+processed_data_save_dir: ./data/processed
