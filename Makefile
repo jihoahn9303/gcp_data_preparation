@@ -23,8 +23,13 @@ DOCKER_COMPOSE_EXEC = $(DOCKER_COMPOSE_COMMAND) exec $(SERVICE_NAME)
 
 export
 
+# Returns true if the stem is a non-empty environment variable, or else raises an error.
 guard-%:
-	@$(or ${$*}, $(error $* is not set))
+	@${${$*}:?Error: $* is not set}
+
+## Generate final config. CONFIG_NAME=<config_name> has to be providded. For overrides use: OVERRIDES=<overrides>
+generate-final-config: up guard-CONFIG_NAME
+	$(DOCKER_COMPOSE_EXEC) python ./jeffrey/generate_final_config.py --config-name $${CONFIG_NAME} --overrides $${OVERRIDES}
 
 ## Call entrypoint code
 prepare-data: up

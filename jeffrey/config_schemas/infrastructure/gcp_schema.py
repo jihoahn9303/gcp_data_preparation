@@ -6,6 +6,8 @@ from pydantic.dataclasses import dataclass
 class GCPConfig:
     project_id: str = "e2eml-jiho-430901"
     secret_version: str = "v1"
+    zone: str = "asia-northeast3-a"
+    network: str = "default"
 
 
 def register_config() -> None:

@@ -4,7 +4,7 @@ from pathlib import Path
 from config_schemas.data_preparing_config_schema import DataPreparingConfig
 from hydra.utils import instantiate
 import dask.dataframe as dd
-from dask.distributed import Client
+from dask.distributed import Client, wait
 from utils.utils import get_logger
 from utils.config_utils import get_config
 from utils.data_utils import get_raw_data_with_version
@@ -16,10 +16,7 @@ def process_raw_data(
     df_partition: dd.DataFrame, 
     dataset_cleaner_manager: DatasetCleanerManager
 ) -> dd.Series:
-    result = df_partition["text"].apply(dataset_cleaner_manager)
-    del df_partition
-    gc.collect()
-    return result
+    return df_partition["text"].apply(dataset_cleaner_manager)
 
 
 @get_config(config_path="../configs", config_name="data_preparing_config")  # type: ignore
