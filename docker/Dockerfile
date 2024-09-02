@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.10.12-slim
 
 ARG USER_ID
 ARG USER_NAME
@@ -12,8 +12,8 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONPATH="/app:${PYTHONPATH}" \
     BUILD_POETRY_LOCK="${HOME}/poetry.lock.build"
 
-RUN apt-get update \
-    && apt-get -qq -y install vim gcc curl git build-essential libb64-dev software-properties-common \
+RUN apt-get update && apt-get install -qq -y \
+    vim gcc curl git build-essential libb64-dev software-properties-common \
     && curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-462.0.1-linux-x86_64.tar.gz \
     && mkdir -p /usr/local/gcloud \
     && tar -C /usr/local/gcloud -zxvf google-cloud-cli-462.0.1-linux-x86_64.tar.gz \
@@ -41,15 +41,12 @@ WORKDIR /app
 RUN poetry config virtualenvs.create false \
     && python3.10 -m venv ${VIRTUAL_ENV} \
     && pip install --upgrade pip setuptools \
-    && poetry install \
+    && poetry install --no-interaction \
     && cp poetry.lock ${BUILD_POETRY_LOCK} \
     && rm -rf ${HOME}/.cache/* \
     && python3.10 -m nltk.downloader stopwords && python3.10 -m nltk.downloader punkt \
     && git config --global user.email "rediate03@gmail.com" \
     && git config --global user.name "jihoahn9303"
 
-ENTRYPOINT ["/bin/bash", "-c"]
+# ENTRYPOINT ["/bin/bash", "-c"]
 CMD ["/app/docker/scripts/startup-script.sh"]
-
-
-

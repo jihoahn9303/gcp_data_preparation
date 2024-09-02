@@ -4,33 +4,68 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 import dask.dataframe as dd
+from dvc.api import get_url
 
 from dask_ml.model_selection import train_test_split
-from utils.utils import get_logger
-from utils.data_utils import repartition_dataframe
+from jeffrey.utils.utils import get_logger
+from jeffrey.utils.data_utils import repartition_dataframe, get_repo_address_with_access_token
 
 
 class DatasetReader(ABC):
     required_columns = {"text", "label", "split", "dataset_name"}
     split_names = {"train", "valid", "test"}
 
-    def __init__(self, dataset_dir: str, dataset_name: str) -> None:
+    def __init__(
+        self, 
+        dataset_dir: str,
+        dataset_name: str,
+        gcp_project_id: str,
+        gcp_secret_id: str,
+        secret_version_id: str,
+        dvc_remote_repo_address: str,
+        user_name: str,
+        data_version: str
+    ) -> None:
         self.logger = get_logger(self.__class__.__name__)
         self.dataset_dir = dataset_dir
         self.dataset_name = dataset_name
+        self.dvc_remote_repo = get_repo_address_with_access_token(
+            gcp_project_id=gcp_project_id,
+            gcp_secret_id=gcp_secret_id,
+            secret_version_id=secret_version_id,
+            repo_address=dvc_remote_repo_address,
+            user_name=user_name
+        )
+        self.data_version = data_version
+        
+    def get_dask_dataframe_rows(self, df: dd.DataFrame) -> int:
+        total_length = df.map_partitions(len).compute().sum()
+        return total_length
 
     def read_data(self) -> dd.DataFrame:
         train_df, dev_df, test_df = self._read_data()
+
         df = self.assign_split_names_to_dataframes_and_merge(train_df, dev_df, test_df)
         df["dataset_name"] = self.dataset_name
+        
+        num_rows = self.get_dask_dataframe_rows(df)
+        assert num_rows != 0
 
         if any(required_column not in df.columns.values for required_column in self.required_columns):
             raise ValueError(f"Dataset must contain all required columns: {self.required_columns}")
 
-        unique_split_names = set(df["split"].unique().compute().tolist())
-        if unique_split_names != self.split_names:
-            raise ValueError(f"Dataset must contain all required split names: {self.split_names}")
+        # 메모리 자원 확인 or compute() 대신 다른 코드 사용 고려 -> 최적화 과정에서 indexerror가 발생?
+        # unique_split_names = set(df["split"].drop_duplicates().compute().tolist())
+        # if unique_split_names != self.split_names:
+        #     raise ValueError(f"Dataset must contain all required split names: {self.split_names}")
+        
+        df_pd = df.compute()  # 전체 데이터프레임을 Pandas로 변환
+        unique_split_names = set(df_pd["split"].unique())
 
+        if len(unique_split_names) != len(self.split_names):
+            raise ValueError(f"Dataset must contain all required split names: {self.split_names}")
+        
+        del df_pd
         return df[list(self.required_columns)]
 
     @abstractmethod
@@ -72,19 +107,48 @@ class DatasetReader(ABC):
 
         return dd.concat(first_dfs), dd.concat(second_dfs)
 
+    def get_remote_data_url(self, dataset_path: str, dvc_remote_name: str = "gs-remote-storage") -> str:
+        return get_url(
+            path=dataset_path,
+            repo=self.dvc_remote_repo,
+            rev=self.data_version,
+            remote=dvc_remote_name
+        )
 
 class GHCDatasetReader(DatasetReader):
-    def __init__(self, dataset_dir: str, dataset_name: str, split_ratio: float) -> None:
-        super().__init__(dataset_dir, dataset_name)
+    def __init__(
+        self, 
+        dataset_dir: str,
+        dataset_name: str,
+        split_ratio: float,
+        gcp_project_id: str,
+        gcp_secret_id: str,
+        secret_version_id: str,
+        dvc_remote_repo_address: str,
+        user_name: str,
+        data_version: str
+    ) -> None:
+        super().__init__(
+            dataset_dir, 
+            dataset_name,
+            gcp_project_id,
+            gcp_secret_id,
+            secret_version_id,
+            dvc_remote_repo_address,
+            user_name,
+            data_version
+        )
         self.split_ratio = split_ratio
 
     def _read_data(self) -> tuple[dd.DataFrame, dd.DataFrame, dd.DataFrame]:
         self.logger.info("Reading GHC Dataset...")
         train_tsv_path = os.path.join(self.dataset_dir, "ghc_train.tsv")
-        train_df = dd.read_csv(urlpath=train_tsv_path, sep="\t", header=0)
+        train_tsv_url = self.get_remote_data_url(dataset_path=train_tsv_path)
+        train_df = dd.read_csv(train_tsv_url, sep="\t", header=0)
 
         test_tsv_path = os.path.join(self.dataset_dir, "ghc_test.tsv")
-        test_df = dd.read_csv(urlpath=test_tsv_path, sep="\t", header=0)
+        test_tsv_url = self.get_remote_data_url(dataset_path=test_tsv_path)
+        test_df = dd.read_csv(test_tsv_url, sep="\t", header=0)
 
         train_df["label"] = (train_df["hd"] + train_df["cv"] + train_df["vo"] > 0).astype(int)
         test_df["label"] = (test_df["hd"] + test_df["cv"] + test_df["vo"] > 0).astype(int)
@@ -95,8 +159,28 @@ class GHCDatasetReader(DatasetReader):
 
 
 class JigsawToxicCommentsDatasetReader(DatasetReader):
-    def __init__(self, dataset_dir: str, dataset_name: str, split_ratio: float) -> None:
-        super().__init__(dataset_dir, dataset_name)
+    def __init__(
+        self, 
+        dataset_dir: str,
+        dataset_name: str,
+        split_ratio: float,
+        gcp_project_id: str,
+        gcp_secret_id: str,
+        secret_version_id: str,
+        dvc_remote_repo_address: str,
+        user_name: str,
+        data_version: str
+    ) -> None:
+        super().__init__(
+            dataset_dir, 
+            dataset_name,
+            gcp_project_id,
+            gcp_secret_id,
+            secret_version_id,
+            dvc_remote_repo_address,
+            user_name,
+            data_version
+        )
         self.split_ratio = split_ratio
 
     def get_text_and_label_columns(self, df: dd.DataFrame) -> dd.DataFrame:
@@ -112,17 +196,20 @@ class JigsawToxicCommentsDatasetReader(DatasetReader):
         self.logger.info("Reading Jigsaw toxic Dataset...")
 
         test_csv_path = os.path.join(self.dataset_dir, "test.csv")
-        test_df = dd.read_csv(test_csv_path)
+        test_csv_url = self.get_remote_data_url(dataset_path=test_csv_path)
+        test_df = dd.read_csv(test_csv_url)
 
         test_labels_csv_path = os.path.join(self.dataset_dir, "test_labels.csv")
-        test_labels_df = dd.read_csv(test_labels_csv_path)
+        test_labels_csv_url = self.get_remote_data_url(dataset_path=test_labels_csv_path)
+        test_labels_df = dd.read_csv(test_labels_csv_url)
 
         test_df = test_df.merge(test_labels_df, on=["id"])
         test_df = test_df[test_df["toxic"] != -1]
         test_df = self.get_text_and_label_columns(test_df)
 
         train_csv_path = os.path.join(self.dataset_dir, "train.csv")
-        train_df = dd.read_csv(train_csv_path)
+        train_csv_url = self.get_remote_data_url(dataset_path=train_csv_path)
+        train_df = dd.read_csv(train_csv_url)
         train_df = self.get_text_and_label_columns(train_df)
 
         train_df, valid_df = self.split_dataset(df=train_df, test_size=self.split_ratio, stratify_column="label")
@@ -131,8 +218,29 @@ class JigsawToxicCommentsDatasetReader(DatasetReader):
 
 
 class TwitterDatasetReader(DatasetReader):
-    def __init__(self, dataset_dir: str, dataset_name: str, valid_split_ratio: float, test_split_ratio: float) -> None:
-        super().__init__(dataset_dir, dataset_name)
+    def __init__(
+        self, 
+        dataset_dir: str, 
+        dataset_name: str, 
+        valid_split_ratio: float, 
+        test_split_ratio: float,
+        gcp_project_id: str,
+        gcp_secret_id: str,
+        secret_version_id: str,
+        dvc_remote_repo_address: str,
+        user_name: str,
+        data_version: str
+    ) -> None:
+        super().__init__(
+            dataset_dir, 
+            dataset_name,
+            gcp_project_id,
+            gcp_secret_id,
+            secret_version_id,
+            dvc_remote_repo_address,
+            user_name,
+            data_version
+        )
         self.valid_split_ratio = valid_split_ratio
         self.test_split_ratio = test_split_ratio
 
@@ -145,7 +253,7 @@ class TwitterDatasetReader(DatasetReader):
 
     def get_text_and_label_columns(self, df: dd.DataFrame) -> dd.DataFrame:
         df["label"] = df["cyberbullying_type"].apply(
-            func=lambda x: self.get_label_from_comment_text(x), meta=("x", "int64")
+            lambda x: self.get_label_from_comment_text(x), meta=("x", "int64")
         )
         df = df.rename(columns={"tweet_text": "text"})
 
@@ -158,7 +266,8 @@ class TwitterDatasetReader(DatasetReader):
         self.logger.info("Reading Twitter Dataset...")
 
         df_path = os.path.join(self.dataset_dir, "cyberbullying_tweets.csv")
-        df = dd.read_csv(df_path)
+        df_url = self.get_remote_data_url(dataset_path=df_path)
+        df = dd.read_csv(df_url)
         df = self.get_text_and_label_columns(df)
 
         train_df, valid_df = self.split_dataset(df=df, test_size=self.valid_split_ratio, stratify_column="label")
@@ -169,13 +278,23 @@ class TwitterDatasetReader(DatasetReader):
 
 
 class DatasetReaderManager:
-    def __init__(self, dataset_readers: dict[str, DatasetReader], repartition: bool = True) -> None:
+    def __init__(
+        self, 
+        dataset_readers: dict[str, DatasetReader], 
+        repartition: bool = True,
+        available_memory: Optional[float] = None
+    ) -> None:
         self.dataset_readers = dataset_readers
         self.repartition = repartition
+        self.available_memory = available_memory
 
     def read_data(self, n_workers: int) -> dd.DataFrame:
         dfs = [dataset_reader.read_data() for dataset_reader in self.dataset_readers.values()]
         df = dd.concat(dfs)
         if self.repartition:
-            df = repartition_dataframe(df, n_workers=n_workers)
+            df = repartition_dataframe(
+                df=df, 
+                n_workers=n_workers, 
+                available_memory=self.available_memory
+            )
         return df

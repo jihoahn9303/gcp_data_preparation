@@ -10,7 +10,7 @@ from typing import Dict, List, Union
 
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-from utils.utils import SpellCorrectionModel
+from jeffrey.utils.utils import SpellCorrectionModel
 
 
 class DatasetCleaner(ABC):

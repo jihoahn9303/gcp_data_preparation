@@ -10,7 +10,7 @@ from pydantic.dataclasses import dataclass
 
 @dataclass
 class SpellCorrectionModelConfig:
-    _target_: str = "utils.utils.SpellCorrectionModel"
+    _target_: str = "jeffrey.utils.utils.SpellCorrectionModel"
     max_dictionary_edit_distance: int = 2
     prefix_length: int = 7
     count_threshold: int = 1
@@ -23,65 +23,65 @@ class DatasetCleanerConfig:
 
 @dataclass
 class StopWordsDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "data_processing.dataset_cleaners.StopWordsDatasetCleaner"
+    _target_: str = "jeffrey.data_processing.dataset_cleaners.StopWordsDatasetCleaner"
 
 
 @dataclass
 class ToLowerCaseDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "data_processing.dataset_cleaners.ToLowerCaseDatasetCleaner"
+    _target_: str = "jeffrey.data_processing.dataset_cleaners.ToLowerCaseDatasetCleaner"
 
 
 @dataclass
 class URLDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "data_processing.dataset_cleaners.URLDatasetCleaner"
+    _target_: str = "jeffrey.data_processing.dataset_cleaners.URLDatasetCleaner"
 
 
 @dataclass
 class PunctuationDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "data_processing.dataset_cleaners.PunctuationDatasetCleaner"
+    _target_: str = "jeffrey.data_processing.dataset_cleaners.PunctuationDatasetCleaner"
     punctuation: str = string.punctuation
 
 
 @dataclass
 class NonLettersDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "data_processing.dataset_cleaners.NonLettersDatasetCleaner"
+    _target_: str = "jeffrey.data_processing.dataset_cleaners.NonLettersDatasetCleaner"
 
 
 @dataclass
 class NewLineCharacterDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "data_processing.dataset_cleaners.NewLineCharacterDatasetCleaner"
+    _target_: str = "jeffrey.data_processing.dataset_cleaners.NewLineCharacterDatasetCleaner"
 
 
 @dataclass
 class NonASCIIDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "data_processing.dataset_cleaners.NonASCIIDatasetCleaner"
+    _target_: str = "jeffrey.data_processing.dataset_cleaners.NonASCIIDatasetCleaner"
 
 
 @dataclass
 class ReferanceToAccountDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "data_processing.dataset_cleaners.ReferanceToAccountDatasetCleaner"
+    _target_: str = "jeffrey.data_processing.dataset_cleaners.ReferanceToAccountDatasetCleaner"
 
 
 @dataclass
 class ReTweetDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "data_processing.dataset_cleaners.ReTweetDatasetCleaner"
+    _target_: str = "jeffrey.data_processing.dataset_cleaners.ReTweetDatasetCleaner"
 
 
 @dataclass
 class SpellCorrectionDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "data_processing.dataset_cleaners.SpellCorrectionDatasetCleaner"
+    _target_: str = "jeffrey.data_processing.dataset_cleaners.SpellCorrectionDatasetCleaner"
     spell_correction_model: Any = SpellCorrectionModelConfig()
 
 
 @dataclass
 class CharacterLimiterDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "data_processing.dataset_cleaners.CharacterLimiterDatasetCleaner"
+    _target_: str = "jeffrey.data_processing.dataset_cleaners.CharacterLimiterDatasetCleaner"
     character_limit: int = 300
 
 
 @dataclass
 class DatasetCleanerManagerConfig:
-    _target_: str = "data_processing.dataset_cleaners.DatasetCleanerManager"
+    _target_: str = "jeffrey.data_processing.dataset_cleaners.DatasetCleanerManager"
     dataset_cleaners: Any = field(default_factory=lambda: {})
 
 

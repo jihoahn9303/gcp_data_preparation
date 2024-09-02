@@ -138,3 +138,6 @@ dmypy.json
 data/
 
 .Trash-*
+
+creds/*
+!creds/gcp-servicekey-example.json

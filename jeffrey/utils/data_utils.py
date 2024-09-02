@@ -4,7 +4,8 @@ from typing import Optional
 import psutil
 import dask.dataframe as dd
 
-from utils.utils import run_shell_command
+from jeffrey.utils.gcp_utils import access_secret_version
+from jeffrey.utils.utils import run_shell_command
 
 
 def get_cmd_to_get_raw_data(
@@ -70,23 +71,24 @@ def get_npartitions(
     min_partition_size: int,
     aimed_nrof_partitions_per_worker: int,
 ) -> int:
-    # 가용 메모리 설정
     total_available_memory = (available_memory * n_workers if available_memory is not None 
                               else psutil.virtual_memory().available)
     
-    # 예외 처리: 메모리 사용량이 최소 파티션 크기 이하인 경우
     if df_memory_usage <= min_partition_size:
         return 1
 
-    # 예외 처리: 워커 수에 따른 파티션 크기가 최소 크기 이하인 경우
     if df_memory_usage / n_workers <= min_partition_size:
         return round(df_memory_usage / min_partition_size)
     
-    # 파티션 계산
-    nrof_partitions_per_worker = max(1, int(df_memory_usage / total_available_memory))
+    nrof_partitions_per_worker = 0
+    required_memory = float("inf")
+
+    while required_memory > total_available_memory:
+        nrof_partitions_per_worker += 1
+        required_memory = df_memory_usage / nrof_partitions_per_worker
+
     nrof_partitions = nrof_partitions_per_worker * n_workers
 
-    # 파티션 수 조정
     while (df_memory_usage / (nrof_partitions + 1)) > min_partition_size and (
         nrof_partitions // n_workers
     ) < aimed_nrof_partitions_per_worker:
@@ -108,3 +110,20 @@ def repartition_dataframe(
     )
     partitioned_df: dd.DataFrame = df.repartition(npartitions=1).repartition(npartitions=nrof_partitions)  # type: ignore
     return partitioned_df
+
+def get_repo_address_with_access_token(
+    gcp_project_id: str,
+    gcp_secret_id: str,
+    secret_version_id: str,
+    repo_address: str,
+    user_name: str
+) -> str:
+    access_token = access_secret_version(
+        project_id=gcp_project_id, 
+        secret_id=gcp_secret_id, 
+        version_id=secret_version_id
+    )
+    repo_address = repo_address.replace("http://", "")
+    return f"https://{user_name}:{access_token}@{repo_address}"
+
+    

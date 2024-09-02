@@ -1,9 +1,10 @@
-from config_schemas.data_processing import dataset_cleaners_schema, dataset_readers_schema
-from config_schemas.infrastructure import gcp_schema
-from config_schemas.dask_cluster import dask_cluster_schema
 from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
 from pydantic.dataclasses import dataclass
+
+from jeffrey.config_schemas.data_processing import dataset_cleaners_schema, dataset_readers_schema
+from jeffrey.config_schemas.infrastructure import gcp_schema
+from jeffrey.config_schemas.dask_cluster import dask_cluster_schema
 
 
 @dataclass
@@ -20,6 +21,9 @@ class DataPreparingConfig:
     dataset_cleaner_manager: dataset_cleaners_schema.DatasetCleanerManagerConfig = MISSING
     dask_cluster: dask_cluster_schema.DaskClusterConfig = MISSING
     processed_data_save_dir: str = MISSING
+    docker_image_name: str = MISSING
+    docker_image_tag: str = MISSING
+    run_tag: str = "default_run"
 
 
 def setup_config() -> None:

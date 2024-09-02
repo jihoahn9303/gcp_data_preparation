@@ -2,8 +2,10 @@ services:
   app:
     user: "${USER_ID:-1000}"
     hostname: "${HOST_NAME:-jeffrey}"
-    image: "${IMAGE_NAME:-jeffrey-template}"
-    container_name: "${CONTAINER_NAME:-jeffrey-template-container}"
+    image: cyberbullying-data-preparation
+    container_name: cyberbullying-data-preparation-container
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=./creds/e2eml-jiho-430901-82abb03a70c5.json
     build:
       context: .
       dockerfile: ./docker/Dockerfile
@@ -13,9 +15,9 @@ services:
     volumes:
       - ./:/app/
       - ~/.config/gcloud:/home/${USER_NAME}/.config/gcloud
+      - ~/.config/dask:/home/${USER_NAME}/.config/dask
     ports:
       - 8888:8888
     ipc: host
     init: true
-
 

@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from utils.config_utils import (
+from jeffrey.utils.config_utils import (
     compose_config, 
     config_args_parser, 
     save_config_as_pickle, 

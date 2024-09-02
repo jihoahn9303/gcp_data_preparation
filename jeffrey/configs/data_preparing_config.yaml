@@ -2,7 +2,7 @@ defaults:
   - data_preparing_config_schema
   - dataset_reader_manager: ghc_jigsaw_twitter
   - dataset_cleaner_manager: simple_dataset_cleaner
-  - dask_cluster: local_dask_cluster
+  - dask_cluster: gcp_dask_cluster
   
   - override hydra/job_logging: custom
   - override hydra/hydra_logging: disabled
@@ -16,4 +16,4 @@ hydra:
 
 data_version: v3
 access_token_secret_version: "1"
-processed_data_save_dir: ./data/processed
+processed_data_save_dir: gs://jeffrey-data-versioning/data/processed/${run_tag}

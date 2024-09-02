@@ -5,8 +5,8 @@ from pydantic.dataclasses import dataclass
 @dataclass
 class GCPConfig:
     project_id: str = "e2eml-jiho-430901"
-    secret_version: str = "v1"
-    zone: str = "asia-northeast3-a"
+    secret_version: str = "1"
+    zone: str = "asia-northeast3-c"
     network: str = "default"
 
 

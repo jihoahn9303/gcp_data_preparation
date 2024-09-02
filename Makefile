@@ -1,7 +1,7 @@
 # Make all targets .PHONY
 .PHONY: $(shell sed -n -e '/^$$/ { n ; /^[^ .\#][^ ]*:/ { s/:.*$$// ; p ; } ; }' $(MAKEFILE_LIST))
 
-SHELL := /usr/bin/env bash
+SHELL = /usr/bin/env bash
 USER_NAME = $(shell whoami)
 USER_ID = $(shell id -u)
 HOST_NAME = $(shell hostname)
@@ -13,13 +13,23 @@ else
 endif
 
 SERVICE_NAME = app
-IMAGE_NAME = jeffrey-data-preparation
-CONTAINER_NAME = jeffrey-data-preparation-container
+IMAGE_NAME = cyberbullying-data-preparation
+CONTAINER_NAME = cyberbullying-data-preparation-container
 
 DIRS_TO_VALIDATE = jeffrey
 
 DOCKER_COMPOSE_RUN = $(DOCKER_COMPOSE_COMMAND) run --rm $(SERVICE_NAME)
 DOCKER_COMPOSE_EXEC = $(DOCKER_COMPOSE_COMMAND) exec $(SERVICE_NAME)
+
+LOCAL_DOCKER_IMAGE_NAME = cyberbullying-data-preparation
+
+GCP_PROJECT_ID := e2eml-jiho-430901
+GCP_REGION := asia-northeast3
+GCP_REPO_NAME := cyberbullying
+ONLY_DOCKER_IMAGE_NAME := data-processing
+GCP_DOCKER_IMAGE_NAME := $(GCP_REGION)-docker.pkg.dev/$(GCP_PROJECT_ID)/$(GCP_REPO_NAME)/$(ONLY_DOCKER_IMAGE_NAME)
+GCP_DOCKER_IMAGE_TAG := $(strip $(shell uuidgen))
+
 
 export
 
@@ -29,11 +39,25 @@ guard-%:
 
 ## Generate final config. CONFIG_NAME=<config_name> has to be providded. For overrides use: OVERRIDES=<overrides>
 generate-final-config: up guard-CONFIG_NAME
-	$(DOCKER_COMPOSE_EXEC) python ./jeffrey/generate_final_config.py --config-name $${CONFIG_NAME} --overrides $${OVERRIDES}
+	$(DOCKER_COMPOSE_EXEC) python ./jeffrey/generate_final_config.py --config-name $${CONFIG_NAME} --overrides docker_image_name=$(GCP_DOCKER_IMAGE_NAME) docker_image_tag=$(GCP_DOCKER_IMAGE_TAG) $${OVERRIDES}
 
-## Call entrypoint code
-prepare-data: up
+## Generate final config for data preparing. For overrides use: OVERRIDES=<overrides>
+generate-final-data-preparing-config: up
+	$(DOCKER_COMPOSE_EXEC) python ./jeffrey/generate_final_config.py --config-name data_preparing_config --overrides docker_image_name=$(GCP_DOCKER_IMAGE_NAME) docker_image_tag=$(GCP_DOCKER_IMAGE_TAG) $${OVERRIDES}
+
+## Prepare(+processing) data for model 
+prepare-data: generate-final-data-preparing-config push
 	$(DOCKER_COMPOSE_EXEC) python ./jeffrey/prepare-data.py
+
+## Prepare(+processing) data for model in local (debug mode)
+prepare-data-in-local: generate-final-data-preparing-config
+	$(DOCKER_COMPOSE_EXEC) python ./jeffrey/prepare-data.py
+
+## Push docker image to GCP artifact registry
+push: build
+	gcloud auth configure-docker --quiet asia-northeast3-docker.pkg.dev
+	docker tag $(LOCAL_DOCKER_IMAGE_NAME):latest $(GCP_DOCKER_IMAGE_NAME):$(GCP_DOCKER_IMAGE_TAG)
+	docker push $(GCP_DOCKER_IMAGE_NAME):$(GCP_DOCKER_IMAGE_TAG)
 
 ## Starts jupyter lab
 notebook: up
