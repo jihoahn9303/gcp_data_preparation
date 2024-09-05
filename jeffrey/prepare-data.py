@@ -6,6 +6,7 @@ import dask.dataframe as dd
 from dask.distributed import Client
 
 from jeffrey.config_schemas.data_preparing_config_schema import DataPreparingConfig
+from jeffrey.utils.data_utils import filter_based_on_min_words
 from jeffrey.utils.io_utils import write_yaml_file
 from jeffrey.utils.utils import get_logger
 from jeffrey.utils.config_utils import get_pickle_config, custom_instantiate
@@ -54,9 +55,17 @@ def process_data(config: DataPreparingConfig) -> None:
         valid_parquet_path = os.path.join(processed_data_save_dir, "valid.parquet")
         test_parquet_path = os.path.join(processed_data_save_dir, "test.parquet")
         
-        df[df["split"] == "train"].to_parquet(train_parquet_path)
-        df[df["split"] == "valid"].to_parquet(valid_parquet_path)
-        df[df["split"] == "test"].to_parquet(test_parquet_path)
+        train_df = df[df["split"] == "train"]
+        valid_df = df[df["split"] == "valid"]
+        test_df = df[df["split"] == "test"]
+        
+        train_df = filter_based_on_min_words(train_df, min_words=config.min_words)
+        valid_df = filter_based_on_min_words(valid_df, min_words=config.min_words)
+        test_df = filter_based_on_min_words(test_df, min_words=config.min_words)
+        
+        train_df.to_parquet(train_parquet_path)
+        valid_df.to_parquet(valid_parquet_path)
+        test_df.to_parquet(test_parquet_path)
         
         docker_info = {"docker_image": config.docker_image_name, "docker_tag": config.docker_image_tag}
         docker_info_save_path = os.path.join(processed_data_save_dir, "docker_info.yaml")

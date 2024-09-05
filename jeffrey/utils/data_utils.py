@@ -3,6 +3,7 @@ from typing import Optional
 
 import psutil
 import dask.dataframe as dd
+import pandas as pd
 
 from jeffrey.utils.gcp_utils import access_secret_version
 from jeffrey.utils.utils import run_shell_command
@@ -126,4 +127,5 @@ def get_repo_address_with_access_token(
     repo_address = repo_address.replace("http://", "")
     return f"https://{user_name}:{access_token}@{repo_address}"
 
-    
+def filter_based_on_min_words(df: pd.DataFrame, min_words: int) -> pd.DataFrame:
+    return df[df["cleaned_text"].str.split().apply(len) >= min_words]

@@ -24,6 +24,7 @@ class DataPreparingConfig:
     docker_image_name: str = MISSING
     docker_image_tag: str = MISSING
     run_tag: str = "default_run"
+    min_words: int = 2
 
 
 def setup_config() -> None:

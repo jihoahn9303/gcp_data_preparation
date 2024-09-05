@@ -4,7 +4,7 @@ dask_cluster:
   asynchronous: null
   debug: false
   disk_type: pd-standard
-  docker_image: asia-northeast3-docker.pkg.dev/e2eml-jiho-430901/cyberbullying/data-processing:1ac4ba97-588c-470d-9da3-daf765b55d2c
+  docker_image: asia-northeast3-docker.pkg.dev/e2eml-jiho-430901/cyberbullying/data-processing:8efccafe-80f0-4cb6-8db6-e8438ee58358
   env_vars: {}
   extra_bootstrap:
   - gcloud auth configure-docker --quiet asia-northeast3-docker.pkg.dev
@@ -75,7 +75,7 @@ dataset_reader_manager:
       gcp_project_id: e2eml-jiho-430901
       gcp_secret_id: jeffrey-data-github-access-token
       secret_version_id: '1'
-      split_ratio: 0.1
+      split_ratio: 0.03
       user_name: jihoahn9303
     twitter:
       _target_: jeffrey.data_processing.dataset_readers.TwitterDatasetReader
@@ -86,12 +86,12 @@ dataset_reader_manager:
       gcp_project_id: e2eml-jiho-430901
       gcp_secret_id: jeffrey-data-github-access-token
       secret_version_id: '1'
-      test_split_ratio: 0.2
+      test_split_ratio: 0.1
       user_name: jihoahn9303
-      valid_split_ratio: 0.25
+      valid_split_ratio: 0.125
   repartition: true
 docker_image_name: asia-northeast3-docker.pkg.dev/e2eml-jiho-430901/cyberbullying/data-processing
-docker_image_tag: 1ac4ba97-588c-470d-9da3-daf765b55d2c
+docker_image_tag: 8efccafe-80f0-4cb6-8db6-e8438ee58358
 dvc_data_folder: data/raw
 dvc_remote_repo: https://github.com/jihoahn9303/data-versioning.git
 github_access_token_secret_id: jeffrey-data-github-access-token
@@ -101,5 +101,6 @@ infrastructure:
   project_id: e2eml-jiho-430901
   secret_version: '1'
   zone: asia-northeast3-c
-processed_data_save_dir: gs://jeffrey-data-versioning/data/processed/default_run
-run_tag: default_run
+min_words: 2
+processed_data_save_dir: gs://jeffrey-data-versioning/data/processed/rebalanced_splits
+run_tag: rebalanced_splits
