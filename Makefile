@@ -45,6 +45,10 @@ generate-final-config: up guard-CONFIG_NAME
 generate-final-data-preparing-config: up
 	$(DOCKER_COMPOSE_EXEC) python ./jeffrey/generate_final_config.py --config-name data_preparing_config --overrides docker_image_name=$(GCP_DOCKER_IMAGE_NAME) docker_image_tag=$(GCP_DOCKER_IMAGE_TAG) $${OVERRIDES}
 
+## Generate final tokenizer training config. For overrides use: OVERRIDES=<overrides>
+generate-final-tokenizer-training-config: up
+	$(DOCKER_COMPOSE_EXEC) python ./jeffrey/generate_final_config.py --config-name tokenizer_training_config --overrides docker_image_name=$(GCP_DOCKER_IMAGE_NAME) docker_image_tag=$(GCP_DOCKER_IMAGE_TAG) $${OVERRIDES}
+
 ## Prepare(+processing) data for model 
 prepare-data: generate-final-data-preparing-config push
 	$(DOCKER_COMPOSE_EXEC) python ./jeffrey/prepare-data.py
@@ -52,6 +56,14 @@ prepare-data: generate-final-data-preparing-config push
 ## Prepare(+processing) data for model in local (debug mode)
 prepare-data-in-local: generate-final-data-preparing-config
 	$(DOCKER_COMPOSE_EXEC) python ./jeffrey/prepare-data.py
+
+## Train a tokenizer
+train-tokenizer: generate-final-tokenizer-training-config push
+	$(DOCKER_COMPOSE_EXEC) python ./jeffrey/train_tokenizer.py
+
+## Train a tokenizer locally
+train-tokenizer-in-local: generate-final-tokenizer-training-config
+	$(DOCKER_COMPOSE_EXEC) python ./jeffrey/train_tokenizer.py
 
 ## Push docker image to GCP artifact registry
 push: build

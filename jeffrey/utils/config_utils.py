@@ -14,7 +14,7 @@ import hydra
 import yaml
 from hydra import initialize, compose
 
-from jeffrey.config_schemas import data_preparing_config_schema
+from jeffrey.config_schemas import data_preparing_config_schema, tokenizer_training_config_schema
 from hydra.types import TaskFunction
 from omegaconf import DictConfig, OmegaConf
 
@@ -53,6 +53,7 @@ def load_pickle_config(config_path: str, config_name: str) -> Any:
 
 def setup_config() -> None:
     data_preparing_config_schema.setup_config()
+    tokenizer_training_config_schema.setup_config()
 
 def setup_logger() -> None:
     try:

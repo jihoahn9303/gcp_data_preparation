@@ -1,0 +1,41 @@
+data_parquet_path: gs://jeffrey-data-versioning/data/processed/rebalanced_splits/train.parquet
+docker_image_name: asia-northeast3-docker.pkg.dev/e2eml-jiho-430901/cyberbullying/data-processing
+docker_image_tag: 24af4b8f-9c34-4bf3-8db8-f48e2d0733a0
+infrastructure:
+  network: default
+  project_id: e2eml-jiho-430901
+  secret_version: '1'
+  zone: asia-northeast3-c
+text_column_name: cleaned_text
+tokenizer:
+  _target_: jeffrey.tokenization.tokenizers.HuggingFaceTokenizer
+  cls_token: '[CLS]'
+  decoder: null
+  mask_token: '[MASK]'
+  model:
+    _target_: tokenizers.models.BPE
+    cache_capacity: 10000
+    dropout: null
+    fuse_unk: false
+    merges: null
+    unk_token: '[UNK]'
+    vocab: null
+  normalizer: null
+  pad_token: '[PAD]'
+  post_processor: null
+  pre_tokenizer:
+    _target_: tokenizers.pre_tokenizers.Whitespace
+  sep_token: '[SEP]'
+  trainer:
+    _target_: tokenizers.trainers.BpeTrainer
+    initial_alphabet: []
+    min_frequency: 0
+    show_progress: true
+    special_tokens:
+    - '[UNK]'
+    - '[CLS]'
+    - '[SEP]'
+    - '[PAD]'
+    - '[MASK]'
+    vocab_size: 30000
+  unk_token: '[UNK]'

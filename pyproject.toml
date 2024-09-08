@@ -25,6 +25,10 @@ jupyterlab = "^4.2.4"
 bokeh = "~=3.5"
 toolz = "0.12.0"
 
+# Tokenization
+tokenizers = "~=0.13"
+transformers = "~=4.30.1"
+
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
 black = "^24.1.1"
